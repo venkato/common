@@ -1,0 +1,14 @@
+<LanguageInjectionConfiguration>
+  <injection language="Groovy" injector-id="java">
+    <display-name>ClRef.ClRef in groovy (net.sf.jremoterun.utilities.classpath)</display-name>
+    <single-file value="true" />
+    <place><![CDATA[psiParameter().ofMethod(0, psiMethod().withName("ClRef").withParameters("java.lang.String").definedInClass("net.sf.jremoterun.utilities.classpath.ClRef"))]]></place>
+    <place disabled="true"><![CDATA[psiParameter().ofMethod(0, psiMethod().withName("evaluate").withParameters("java.lang.String").definedInClass("groovy.lang.GroovyShell"))]]></place>
+    <place disabled="true"><![CDATA[psiParameter().ofMethod(0, psiMethod().withName("evaluate").withParameters("java.lang.String", "java.lang.String").definedInClass("groovy.lang.GroovyShell"))]]></place>
+    <place disabled="true"><![CDATA[psiParameter().ofMethod(0, psiMethod().withName("evaluate").withParameters("java.lang.String", "java.lang.String", "java.lang.String").definedInClass("groovy.lang.GroovyShell"))]]></place>
+    <place disabled="true"><![CDATA[psiParameter().ofMethod(0, psiMethod().withName("parse").withParameters("java.lang.String").definedInClass("groovy.lang.GroovyShell"))]]></place>
+    <place disabled="true"><![CDATA[psiParameter().ofMethod(0, psiMethod().withName("parse").withParameters("java.lang.String", "java.lang.String").definedInClass("groovy.lang.GroovyShell"))]]></place>
+    <place disabled="true"><![CDATA[psiParameter().ofMethod(0, psiMethod().withName("run").withParameters("java.lang.String", "java.lang.String", "java.lang.String[]").definedInClass("groovy.lang.GroovyShell"))]]></place>
+    <place disabled="true"><![CDATA[psiParameter().ofMethod(0, psiMethod().withName("run").withParameters("java.lang.String", "java.lang.String", "java.util.List").definedInClass("groovy.lang.GroovyShell"))]]></place>
+  </injection>
+</LanguageInjectionConfiguration>
