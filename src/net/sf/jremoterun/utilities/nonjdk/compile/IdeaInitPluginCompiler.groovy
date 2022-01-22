@@ -1,0 +1,108 @@
+package net.sf.jremoterun.utilities.nonjdk.compile
+
+import groovy.transform.CompileStatic
+import net.sf.jremoterun.utilities.JrrClassUtils
+import net.sf.jremoterun.utilities.JrrUtilities
+import net.sf.jremoterun.utilities.classpath.AddFilesToClassLoaderGroovy
+import net.sf.jremoterun.utilities.groovystarter.GroovyMethodRunnerParams
+import net.sf.jremoterun.utilities.mdep.DropshipClasspath
+import net.sf.jremoterun.utilities.nonjdk.FileUtilsJrr
+import net.sf.jremoterun.utilities.nonjdk.IfFrameworkSrcDirs
+import net.sf.jremoterun.utilities.nonjdk.classpath.refs.GitReferences
+import net.sf.jremoterun.utilities.nonjdk.classpath.refs.GitSomeRefs
+import net.sf.jremoterun.utilities.nonjdk.classpath.refs.JrrClassLocationRefs
+import net.sf.jremoterun.utilities.nonjdk.classpath.refs.JrrStarterJarRefs
+import net.sf.jremoterun.utilities.nonjdk.classpath.repohash.FileCheckSumCalc
+import net.sf.jremoterun.utilities.nonjdk.git.GitRef
+import org.apache.commons.codec.digest.DigestUtils
+import org.apache.commons.io.FileUtils
+import org.zeroturnaround.zip.ZipUtil
+
+import java.util.logging.Logger
+
+@CompileStatic
+class IdeaInitPluginCompiler extends GenericCompiler {
+
+    private static final Logger log = JrrClassUtils.getJdkLogForCurrentClass();
+
+
+    IdeaInitPluginCompiler() {
+    }
+
+    @Override
+    void prepare() {
+
+    }
+
+    void compile3(File ideaDir) {
+        prepare(ideaDir)
+        compile()
+        postCompileStep()
+    }
+
+    @Override
+    void compile() {
+        log.info "compiling ..."
+        super.compile()
+    }
+
+    static File getJrrUtilsJar() {
+        JrrUtilsCompiler compiler = new JrrUtilsCompiler()
+        compiler.all2()
+        compiler.zipp()
+        if (GroovyMethodRunnerParams.instance.grHome != null) {
+            File child = GroovyMethodRunnerParams.instance.grHome.child("onejar/jrrutilities.jar")
+            if (child.exists()) {
+                return child
+            }
+            log.info "file not found : ${child}"
+        }
+        File f =  JrrStarterJarRefs.jrrutilitiesOneJar.resolveToFile()
+        return f
+    }
+
+    void prepare(File ideaDir) {
+        assert ideaDir.exists()
+        client.adder.addAllJarsInDir new File(ideaDir, "lib/")
+        client.adder.addAllJarsInDir new File(ideaDir, 'plugins/Groovy/lib/');
+        params.outputDir = new File(client.ifDir, 'build/ideainitpluginbuild')
+        params.outputDir.mkdirs()
+        params.javaVersion = '1.6'
+        params.addInDir IfFrameworkSrcDirs.src_idea.childL('net/sf/jremoterun/utilities/nonjdk/idea/init');
+//        File dir = new File(client.ifDir, 'src-idea/net/sf/jremoterun/utilities/nonjdk/idea/init')
+//        assert dir.exists()
+//        params.files.addAll(dir.listFiles().toList())
+
+
+        client.adder.add getJrrUtilsJar()
+        client.adder.add(JrrClassLocationRefs.JrrUtilities1)
+        client.adder.add(JrrClassLocationRefs.JrrClassUtils1)
+        client.adder.add(JrrClassLocationRefs.AddFilesToClassLoaderGroovy1)
+        client.adder.add(JrrClassLocationRefs.DropshipClasspath1)
+
+    }
+
+    void testUpdateIdeaJar(File tmpJar, File metaInf, File targetJar) {
+        assert targetJar.getParentFile().exists()
+        testUpdateIdeaJar2(tmpJar, metaInf)
+        assert targetJar.getParentFile().exists()
+        FileUtilsJrr.copyFile(tmpJar, targetJar)
+        assert FileCheckSumCalc.calcSha256ForFile(tmpJar) == FileCheckSumCalc.calcSha256ForFile(targetJar)
+        tmpJar.delete()
+        log.info "file updated : ${targetJar}"
+    }
+
+    void testUpdateIdeaJar2(File tmpJar, File metaInf) {
+//        JdkLogFormatter.setLogFormatter()
+        tmpJar.delete()
+        assert !tmpJar.exists()
+
+        assert metaInf.directory
+        FileUtilsJrr.copyDirectoryToDirectory(metaInf, params.outputDir)
+        ZipUtil.pack(params.outputDir, tmpJar)
+
+
+    }
+
+}
+

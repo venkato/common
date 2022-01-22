@@ -1,0 +1,16 @@
+/dist/
+/build/
+/bin/
+/.gradle/
+/.settings/
+/.classpath
+/.project
+/target
+/groovycustom
+/log4j2-config
+/resources
+/resources-groovy
+/richNpe
+/test
+/InvocationFramework.iml
+*.iml
